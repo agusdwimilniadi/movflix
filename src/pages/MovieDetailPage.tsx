@@ -1,9 +1,9 @@
+import { useEffect } from 'react'
 import { usePageTitle } from '../hooks/usePageTitle'
 import { HiArrowLeft } from 'react-icons/hi2'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useMovieDetail } from '../hooks/useMovieDetail'
 import { ErrorMessage } from '../components/common/ErrorMessage'
-import { Button } from '../components/common/Button'
 import { MovieBadge } from '../components/movie/MovieBadge'
 import { getPosterUrl, getBackdropUrl } from '../services/api'
 import { BaseImage } from '../components/common/BaseImage'
@@ -25,6 +25,10 @@ export function MovieDetailPage() {
   const { movie, credits, videos, isLoading, isError, refetch } = useMovieDetail(movieId)
 
   usePageTitle(movie?.title)
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [movieId])
 
   if (isLoading) {
     return (
@@ -75,7 +79,7 @@ export function MovieDetailPage() {
 
   if (isError || !movie) {
     return (
-      <div className="pt-24">
+      <div className="flex items-center justify-center min-h-screen">
         <ErrorMessage onRetry={refetch} />
       </div>
     )
@@ -96,25 +100,28 @@ export function MovieDetailPage() {
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-t from-movflix-dark via-black/30 to-black/60" />
-        <div className="absolute top-6 left-4">
-          <Button variant="ghost" size="sm" onClick={() => navigate(-1)}>
-            <HiArrowLeft /> Back
-          </Button>
-        </div>
       </div>
 
       <div className="max-w-screen-xl mx-auto px-4 -mt-32 relative z-10 pb-16">
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="pt-20 mb-4">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-300 hover:text-white text-sm transition-colors"
+          >
+            <HiArrowLeft /> Back
+          </button>
+        </div>
+        <div className="flex flex-row gap-4 md:gap-8">
           <div className="flex-shrink-0">
             <BaseImage
               src={getPosterUrl(movie.poster_path, 'w342')}
               alt={movie.title}
-              className="w-48 md:w-64 rounded-lg shadow-2xl"
+              className="w-28 sm:w-40 md:w-64 rounded-lg shadow-2xl"
             />
           </div>
 
           <div className="flex-1 pt-2 md:pt-8">
-            <h1 className="text-3xl md:text-4xl font-black text-white mb-2">{movie.title}</h1>
+            <h1 className="text-xl sm:text-2xl md:text-4xl font-black text-white mb-2">{movie.title}</h1>
 
             {movie.tagline && (
               <p className="text-gray-400 italic mb-3 text-sm">{movie.tagline}</p>
@@ -139,53 +146,54 @@ export function MovieDetailPage() {
               ))}
             </div>
 
-            <p className="text-gray-300 leading-relaxed mb-6 max-w-2xl">{movie.overview}</p>
-
-            {director && (
-              <p className="text-sm text-gray-400 mb-5">
-                <span className="text-white font-semibold">Director:</span> {director.name}
-              </p>
-            )}
-
-            {mainCast.length > 0 && (
-              <div className="mb-6">
-                <h3 className="text-white font-semibold mb-3">Cast</h3>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {mainCast.map((actor) => (
-                    <div key={actor.id} className="text-center">
-                      <div className="w-full aspect-square rounded-full overflow-hidden bg-movflix-gray mb-1">
-                        <BaseImage
-                          src={getPosterUrl(actor.profile_path, 'w185')}
-                          alt={actor.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <p className="text-xs text-white font-medium leading-tight">{actor.name}</p>
-                      <p className="text-xs text-gray-400 leading-tight line-clamp-1">
-                        {actor.character}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {trailer && (
-              <div>
-                <h3 className="text-white font-semibold mb-3">Trailer</h3>
-                <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${trailer.key}`}
-                    title={trailer.name}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className="w-full h-full"
-                  />
-                </div>
-              </div>
-            )}
           </div>
         </div>
+
+        <p className="text-gray-300 leading-relaxed mb-4 max-w-2xl mt-6">{movie.overview}</p>
+
+        {director && (
+          <p className="text-sm text-gray-400 mb-2">
+            <span className="text-white font-semibold">Director:</span> {director.name}
+          </p>
+        )}
+
+        {mainCast.length > 0 && (
+          <div className="mt-8 mb-6">
+            <h3 className="text-white font-semibold mb-3">Cast</h3>
+            <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+              {mainCast.map((actor) => (
+                <div key={actor.id} className="text-center">
+                  <div className="w-full aspect-square rounded-full overflow-hidden bg-movflix-gray mb-1">
+                    <BaseImage
+                      src={getPosterUrl(actor.profile_path, 'w185')}
+                      alt={actor.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <p className="text-xs text-white font-medium leading-tight">{actor.name}</p>
+                  <p className="text-xs text-gray-400 leading-tight line-clamp-1">
+                    {actor.character}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {trailer && (
+          <div className="mt-4">
+            <h3 className="text-white font-semibold mb-3">Trailer</h3>
+            <div className="aspect-video w-full max-w-2xl rounded-lg overflow-hidden">
+              <iframe
+                src={`https://www.youtube.com/embed/${trailer.key}`}
+                title={trailer.name}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

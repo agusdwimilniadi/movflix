@@ -111,12 +111,12 @@ export function HomePage() {
   }, [activeQuery])
 
   if (activeQuery.isLoading) {
-    return <MovieGridSkeleton count={18} showHero={!isSearchMode} />
+    return <MovieGridSkeleton count={isSearchMode ? 36 : 18} showHero={!isSearchMode} />
   }
 
   if (activeQuery.isError) {
     return (
-      <div className="pt-24">
+      <div className="flex items-center justify-center min-h-screen">
         <ErrorMessage onRetry={() => activeQuery.refetch()} />
       </div>
     )
